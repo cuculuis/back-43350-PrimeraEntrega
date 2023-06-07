@@ -6,13 +6,13 @@ export const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 
-app.use('/api/productos', routerProducts);
-app.use('/api/carrito', routerCarts);
+app.use('/api/products', routerProducts);
+app.use('/api/carts', routerCarts);
 
 app.get('*', (req, res) => {
     const ruta = req.path;
     const metodo = req.method;
-    res.status(400).send({Error: -1, description: `Rute: ${ruta} and method ${metodo} not authorized.`});
+    res.status(400).send({Error: `Rute: ${ruta} and method ${metodo} not available.`});
 })
 
 const PORT = process.env.PORT || 8080;

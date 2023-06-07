@@ -1,12 +1,9 @@
-const fs = require('fs');
-
+import fs from 'fs';
 
 class ProductManager {
 
     constructor(path) {
         this.path = path;
-        this.idProducts = 1;
-        this.error = undefined;
         this.checkFileExists()
     }
 
@@ -19,41 +16,30 @@ class ProductManager {
         }
     }
 
-    validateProduct(title, description, price, thumbnail, code, stock) {
-        if (!title || !description || !price || !thumbnail || !code || !stock) 
-        {
-        return this.error = `campos incompletos`
-        }
+    validateProduct(title, description, code, price, status, stock, category) {
+        return !title || !description || !price || !status || !code || !stock || !category 
     }
 
     async checkCodeExists(code) {
         const products = await this.getProducts();
         const existingProduct = products.find(product => product.code === code);
-        if (existingProduct) {
-            console.log(`El código ${code} ya existe`);
-            return false;
-        }
-        return true;
+        
+        return existingProduct
     }
 
     async addProduct(newProduct) {
         await this.checkFileExists()
         try {
             let allProducts = await this.getProducts();
-
-            if  (this.validateProduct(newProduct.title, newProduct.description, newProduct.price, newProduct.thumbnail, newProduct.code, newProduct.stock)) {
-                return `Faltan campos`
-            }
             
-            if (!await this.checkCodeExists(newProduct.code)) {
-                return `No se puede agregar el producto. Code: ${code} duplicado`
-            }
-            newProduct.id = this.idProducts;
+            let lastId = allProducts.length > 0 ? allProducts[allProducts.length - 1].id : 0;
+            newProduct.id = lastId + 1;
+
             allProducts.push(newProduct);
-            this.idProducts++;
+
             await fs.promises.writeFile(this.path, JSON.stringify(allProducts, null, 2));
             
-            return newProduct.id;
+            return `Se agregó el producto: ${newProduct.title} con id: ${newProduct.id}`
         } catch (err) {
             console.log('Hubo un error: ' + err);
         }
@@ -77,7 +63,7 @@ class ProductManager {
                 if (product) {
                     return product;
                 } else {
-                    return `No hay productos con id: ${productId}`;
+                    return false;
                 }
             } catch (err) {
                 console.log('Hubo un error: ' + err);
@@ -101,22 +87,13 @@ class ProductManager {
         }
     }
 
-    async deleteAllProducts() {
-        await this.checkFileExists()
-        try {
-            await fs.promises.writeFile(this.path, '[]');
-            this.idProducts = 1;
-        } catch (err) {
-            console.log('Hubo un error: ' + err);
-        }
-    }
-
     async deleteProductById(idProduct) {
         await this.checkFileExists()
         try {
             let allProducts = await this.getProducts()
             let product = allProducts.filter((item) => item.id !== idProduct)
-            await fs.promises.writeFile(this.path, JSON.stringify(product))
+            await fs.promises.writeFile(this.path, JSON.stringify(product, null, 2))
+            return `Producto con id: ${idProduct} borrado exitosamente.`
         } catch (err) {
             console.log(err);
         }

@@ -1,25 +1,27 @@
 import { Router } from "express";
-import ProductManager from "../Containers/ManagerProducts"
+import ProductManager from "../Containers/ManagerProducts.js"
 
-export const productManager = new ProductManager("../DB/products.txt")
+export const productManager = new ProductManager("./src/DB/products.json")
 const routerProducts = Router()
+
+let admin = true;
 
 
     routerProducts.get('/', async (req, res) => {
         const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
         const products = await productManager.getProducts();
         if (limit) {
-            res.json(products.slice(0, limit));
+            res.status(200).json(products.slice(0, limit));
         } else {
-            res.json(products);
+            res.status(200).json(products);
         }
     })
 
     routerProducts.get('/:pid', async (req, res) => {
         const pid = parseInt(req.params.pid);
-        const product = await productManager.getProductById(id);
+        const product = await productManager.getProductById(pid);
         if (product) {
-            res.json(product);
+            res.status(200).json(product);
         } else {
             res.status(404).json({ error: `Producto con id: ${pid} no encontrado` });
         }
@@ -27,47 +29,78 @@ const routerProducts = Router()
 
 
 if (admin) {
-    routerProducts.post('/', async (req, res) => {
-        const newProduct = {
-            title : req.body.title,
-            description : req.body.description,
-            code : req.body.code,
-            price : req.body.price,
-            thumbnail : req.body.thumbnail,
-            stock : req.body.stock,
-        }
+        routerProducts.post('/', async (req, res) => {
+            const newProduct = {
+                title : req.body.title,
+                description : req.body.description,
+                code : req.body.code,
+                price : req.body.price,
+                status : req.body.status,
+                stock : req.body.stock,
+                category : req.body.category,
+                thumbnail : req.body.thumbnail,
+            }
 
-        res.json(await productManager.addProduct(newProduct))
-    });
+            if (await productManager.validateProduct(req.body.title, req.body.description, req.body.code, req.body.price, req.body.status, req.body.stock, req.body.category)){
+                res.status(400).json({ error: `Los campos "title", "description", "code", "price", "status", "stock", "category" son obligatorios` });
+            }
+            
+            else if(await productManager.checkCodeExists(req.body.code)) {
+                res.status(400).json({ error: `El code: ${req.body.code} ya está usado.` });
+            } 
+
+            else {
+                res.status(200).json(await productManager.addProduct(newProduct))
+            }
 
 
-    routerProducts.put('/:pid', async (req, res) => {
-        const productUpdated = {
-            pid : req.params.pid,
-            title : req.body.title,
-            description : req.body.description,
-            code : req.body.code,
-            price : req.body.price,
-            thumbnail : req.body.thumbnail,
-            stock : req.body.stock,
-        }
-    
-        res.json(await productManager.updateProduct(parseInt(req.params.pid), productUpdated))
-    });
+            
+        });
 
-    routerProducts.delete('/:pid', async (req, res) => {
-        res.json(await productManager.deleteProductById(parseInt(req.params.pid)))
-    });
+
+        routerProducts.put('/:pid', async (req, res) => {
+            const productUpdated = {
+                title : req.body.title,
+                description : req.body.description,
+                code : req.body.code,
+                price : req.body.price,
+                thumbnail : req.body.thumbnail,
+                stock : req.body.stock,
+            }
+
+            if (await productManager.validateProduct(req.body.title, req.body.description, req.body.code, req.body.price, req.body.status, req.body.stock, req.body.category)){
+                res.status(400).json({ error: `Los campos "title", "description", "code", "price", "status", "stock", "category" son obligatorios` });
+            }
+            
+            else if(await productManager.checkCodeExists(req.body.code)) {
+                res.status(400).json({ error: `El code: ${req.body.code} ya está usado.` });
+            } 
+
+            else {
+                res.status(200).json(await productManager.updateProduct(parseInt(req.params.pid), productUpdated))
+            }
+        
+        });
+
+        routerProducts.delete('/:pid', async (req, res) => {
+            const pid = parseInt(req.params.pid);
+            const product = await productManager.getProductById(pid);
+            if (product) {
+                res.status(200).json(await productManager.deleteProductById(parseInt(req.params.pid)))
+            } else {
+                res.status(404).json({ error: `Producto con id: ${pid} no encontrado` });
+            }
+        });
 
     } else {
         routerProducts.post('/', function(req, res) {
-            res.status(401).send({Error: -1, description: `Rute: ${req.path} and method ${req.method} not authorized.`});
+            res.status(401).json({Error: -1, description: `Rute: ${req.path} and method ${req.method} not authorized.`});
         });
         routerProducts.put('/:id', function(req, res) {
-            res.status(401).send({Error: -1, description: `Rute: ${req.path} and method ${req.method} not authorized.`});
+            res.status(401).json({Error: -1, description: `Rute: ${req.path} and method ${req.method} not authorized.`});
         });
         routerProducts.delete('/:id', function(req, res) {
-            res.status(401).send({Error: -1, description: `Rute: ${req.path} and method ${req.method} not authorized.`});
+            res.status(401).json({Error: -1, description: `Rute: ${req.path} and method ${req.method} not authorized.`});
         });
     }
 

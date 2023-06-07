@@ -1,12 +1,9 @@
-const fs = require('fs');
-
+import fs from 'fs';
 
 class CartManager {
 
     constructor(path) {
         this.path = path;
-        this.idCart = 1;
-        this.error = undefined;
         this.checkFileExists()
     }
 
@@ -19,13 +16,6 @@ class CartManager {
         }
     }
 
-    validateProduct(title, description, price, thumbnail, code, stock) {
-        if (!title || !description || !price || !thumbnail || !code || !stock) 
-        {
-        return this.error = `campos incompletos`
-        }
-    }
-
     async addNewCart() {
         await this.checkFileExists()
         try {
@@ -33,15 +23,42 @@ class CartManager {
             const newCart = {
                 products: []
             }
-            newCart.id = this.idCart;
+            let lastId = allCarts.length > 0 ? allCarts[allCarts.length - 1].id : 0;
+            newCart.id = lastId + 1;
             allCarts.push(newCart);
-            this.idCart++;
+
             await fs.promises.writeFile(this.path, JSON.stringify(allCarts, null, 2));
             
-            return newCart.id;
+            return `Se creó el carro con id: ${newCart.id}.`
         } catch (err) {
             console.log('Hubo un error: ' + err);
         }
+    }
+
+    async addProductToCart(idCart, idProduct) {
+            
+        let allCarts = await this.getCarts();
+        const cart = await this.getCartById(idCart);
+        if (!cart) {
+            return false;
+        }
+        
+        const existingProduct = cart.products.find((item) => item.product === idProduct);
+        if (existingProduct) {
+            existingProduct.quantity++; 
+        } else {
+            const product = {
+                product: idProduct,
+                quantity: 1,
+                };
+            cart.products.push(product);
+        }
+        const cartIndex = allCarts.findIndex((item) => item.id === idCart);
+        if (cartIndex !== -1) {
+            allCarts[cartIndex] = cart;
+        }
+        await fs.promises.writeFile(this.path, JSON.stringify(allCarts, null, 2));
+        return cart;
     }
 
     async getCarts() {
@@ -62,46 +79,20 @@ class CartManager {
                 if (cart) {
                     return cart;
                 } else {
-                    return `There is no cart with id: ${cartId}`;
+                    return false;
                 }
             } catch (err) {
                 console.log('Hubo un error: ' + err);
             }
     }
 
-    async updateCart(idCart, cartNow) {
-        await this.checkFileExists()
-        try {
-            let allCarts = await this.getCarts();
-            const index = allCarts.findIndex((item) => item.id === idCart);
-            if (index === -1) {
-                return { error: 'producto no encontrado.'}
-            }
-
-            allCarts[index] = {...cartNow, id: idCart}
-            await fs.promises.writeFile(this.path, JSON.stringify(allCarts, null, 2));
-            return `Se actualizó el producto con id: ${idCart}`;
-        } catch (err) {
-            console.log('Hubo un error: ' + err);
-        }
-    }
-
-    async deleteAllCarts() {
-        await this.checkFileExists()
-        try {
-            await fs.promises.writeFile(this.path, '[]');
-            this.idCart = 1;
-        } catch (err) {
-            console.log('Hubo un error: ' + err);
-        }
-    }
-
     async deleteCartById(idCart) {
         await this.checkFileExists()
         try {
-            let allCarts = await this.getCartById()
-            let cartDeleted = allCarts.filter((item) => item.id !== idCart)
-            await fs.promises.writeFile(this.path, JSON.stringify(cartDeleted))
+            let allCarts = await this.getCarts()
+            let cart = allCarts.filter((item) => item.id !== idCart)
+            await fs.promises.writeFile(this.path, JSON.stringify(cart, null, 2))
+            return `Carrito con id: ${idCart} borrado exitosamente.`
         } catch (err) {
             console.log(err);
         }

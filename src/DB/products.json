@@ -1,0 +1,65 @@
+[
+  {
+    "title": "Manzana",
+    "description": "Fruta tropical",
+    "code": "123manzana",
+    "price": 200,
+    "status": true,
+    "stock": 10,
+    "category": "Fruta",
+    "thumbnail": [
+      "manzana.png"
+    ],
+    "id": 1
+  },
+  {
+    "title": "Pera",
+    "description": "Fruta tropical",
+    "code": "123pera",
+    "price": 200,
+    "status": true,
+    "stock": 10,
+    "category": "Fruta",
+    "thumbnail": [
+      "Pera.png"
+    ],
+    "id": 2
+  },
+  {
+    "title": "Naranja",
+    "description": "Fruta tropical",
+    "code": "123naranja",
+    "price": 300,
+    "status": true,
+    "stock": 10,
+    "category": "Fruta",
+    "thumbnail": [
+      "Naranja.png"
+    ],
+    "id": 3
+  },
+  {
+    "title": "Anana",
+    "description": "Fruta tropical",
+    "code": "123anana",
+    "price": 500,
+    "status": true,
+    "stock": 10,
+    "category": "Fruta",
+    "thumbnail": [
+      "Anana.png"
+    ],
+    "id": 4
+  },
+  {
+    "title": "Fresa",
+    "description": "Fruta tropical",
+    "code": "123fresa",
+    "price": 80,
+    "thumbnail": [
+      "Fresa.png"
+    ],
+    "stock": 60,
+    "id": 5
+  }
+]
