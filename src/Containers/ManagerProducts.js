@@ -12,7 +12,7 @@ class ProductManager {
         await fs.promises.access(this.path);
         } catch (err) {
             await fs.promises.writeFile(this.path, "[]")
-            console.log(`El archivo ${this.path} no existe`);
+            console.log(`The file ${this.path} does not exist`);
         }
     }
 

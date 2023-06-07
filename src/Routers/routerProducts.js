@@ -23,7 +23,7 @@ let admin = true;
         if (product) {
             res.status(200).json(product);
         } else {
-            res.status(404).json({ error: `Producto con id: ${pid} no encontrado` });
+            res.status(404).json({ error: `Product with id: ${pid} not found` });
         }
     })
 
@@ -42,11 +42,11 @@ if (admin) {
             }
 
             if (await productManager.validateProduct(req.body.title, req.body.description, req.body.code, req.body.price, req.body.status, req.body.stock, req.body.category)){
-                res.status(400).json({ error: `Los campos "title", "description", "code", "price", "status", "stock", "category" son obligatorios` });
+                res.status(400).json({ error: `The keys 'title', 'description', 'code', 'price', 'status', 'stock', 'category' are required` });
             }
             
             else if(await productManager.checkCodeExists(req.body.code)) {
-                res.status(400).json({ error: `El code: ${req.body.code} ya está usado.` });
+                res.status(400).json({ error: `The code: ${req.body.code} is already used.` });
             } 
 
             else {
@@ -69,11 +69,11 @@ if (admin) {
             }
 
             if (await productManager.validateProduct(req.body.title, req.body.description, req.body.code, req.body.price, req.body.status, req.body.stock, req.body.category)){
-                res.status(400).json({ error: `Los campos "title", "description", "code", "price", "status", "stock", "category" son obligatorios` });
+                res.status(400).json({ error: `The keys 'title', 'description', 'code', 'price', 'status', 'stock', 'category' are required` });
             }
             
             else if(await productManager.checkCodeExists(req.body.code)) {
-                res.status(400).json({ error: `El code: ${req.body.code} ya está usado.` });
+                res.status(400).json({ error: `The code: ${req.body.code} is already used.` });
             } 
 
             else {
@@ -88,7 +88,7 @@ if (admin) {
             if (product) {
                 res.status(200).json(await productManager.deleteProductById(parseInt(req.params.pid)))
             } else {
-                res.status(404).json({ error: `Producto con id: ${pid} no encontrado` });
+                res.status(404).json({ error: `Product with id: ${pid} not found.` });
             }
         });
 

@@ -12,7 +12,7 @@ class CartManager {
         await fs.promises.access(this.path);
         } catch (err) {
             await fs.promises.writeFile(this.path, "[]")
-            console.log(`El archivo ${this.path} no existe`);
+            console.log(`The file ${this.path} does not exist`);
         }
     }
 
@@ -29,9 +29,9 @@ class CartManager {
 
             await fs.promises.writeFile(this.path, JSON.stringify(allCarts, null, 2));
             
-            return `Se creó el carro con id: ${newCart.id}.`
+            return `The cart was created with id: ${newCart.id}.`
         } catch (err) {
-            console.log('Hubo un error: ' + err);
+            console.log('There was an error: ' + err);
         }
     }
 
@@ -61,13 +61,48 @@ class CartManager {
         return cart;
     }
 
+    async deleteProductToCart(idCart, idProduct) {
+        try {
+            let allCarts = await this.getCarts();
+            const cart = await this.getCartById(idCart);
+            if (!cart) {
+                return false;
+            }
+        
+            const existingProductIndex = cart.products.findIndex((item) => item.product === idProduct);
+            if (existingProductIndex !== -1) {
+                const existingProduct = cart.products[existingProductIndex];
+                if (existingProduct.quantity > 1) {
+                existingProduct.quantity--;
+                } 
+                if (existingProduct.quantity == 1) {
+                cart.products.splice(existingProductIndex, 1);
+                } 
+                const cartIndex = allCarts.findIndex((item) => item.id === idCart);
+                if (cartIndex !== -1) {
+                allCarts[cartIndex] = cart;
+                }
+        
+                await fs.promises.writeFile(this.path, JSON.stringify(allCarts, null, 2));
+                return cart;
+            } else {
+                return false
+            }
+        
+            } catch (error) {
+            console.error(`Error removing product from cart: ${error}`);
+            return false;
+        }
+    }
+
+
     async getCarts() {
         await this.checkFileExists()    
             try {
                 let allCarts = await fs.promises.readFile(this.path, 'utf-8');
                 return JSON.parse(allCarts);
             } catch (err) {
-                console.log('Hubo un error: ' + err);
+                console.log('There was an error: ' + err);
         }
     }
 
@@ -82,7 +117,7 @@ class CartManager {
                     return false;
                 }
             } catch (err) {
-                console.log('Hubo un error: ' + err);
+                console.log('There was an error: ' + err);
             }
     }
 
@@ -92,7 +127,7 @@ class CartManager {
             let allCarts = await this.getCarts()
             let cart = allCarts.filter((item) => item.id !== idCart)
             await fs.promises.writeFile(this.path, JSON.stringify(cart, null, 2))
-            return `Carrito con id: ${idCart} borrado exitosamente.`
+            return `Cart with id: ${idCart} deleted successfully.`
         } catch (err) {
             console.log(err);
         }
