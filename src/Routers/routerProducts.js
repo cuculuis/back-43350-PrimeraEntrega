@@ -64,8 +64,10 @@ if (admin) {
                 description : req.body.description,
                 code : req.body.code,
                 price : req.body.price,
-                thumbnail : req.body.thumbnail,
+                status : req.body.status,
                 stock : req.body.stock,
+                category : req.body.category,
+                thumbnail : req.body.thumbnail,
             }
 
             if (await productManager.validateProduct(req.body.title, req.body.description, req.body.code, req.body.price, req.body.status, req.body.stock, req.body.category)){

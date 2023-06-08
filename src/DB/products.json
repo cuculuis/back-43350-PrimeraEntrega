@@ -52,14 +52,16 @@
     "id": 4
   },
   {
-    "title": "Fresa",
+    "title": "Kiwi",
     "description": "Fruta tropical",
-    "code": "123fresa",
+    "code": "123kiwi",
     "price": 80,
+    "status": true,
+    "stock": 60,
+    "category": "Fruta",
     "thumbnail": [
       "Fresa.png"
     ],
-    "stock": 60,
     "id": 5
   }
 ]

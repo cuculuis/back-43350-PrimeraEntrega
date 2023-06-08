@@ -39,9 +39,9 @@ class ProductManager {
 
             await fs.promises.writeFile(this.path, JSON.stringify(allProducts, null, 2));
             
-            return `Se agregó el producto: ${newProduct.title} con id: ${newProduct.id}`
+            return `Product: ${newProduct.title} with id: ${newProduct.id} added successfully.`
         } catch (err) {
-            console.log('Hubo un error: ' + err);
+            console.log('There was an error: ' + err);
         }
     }
 
@@ -51,7 +51,7 @@ class ProductManager {
                 let allProducts = await fs.promises.readFile(this.path, 'utf-8');
                 return JSON.parse(allProducts);
             } catch (err) {
-                console.log('Hubo un error: ' + err);
+                console.log('There was an error: ' + err);
         }
     }
 
@@ -66,7 +66,7 @@ class ProductManager {
                     return false;
                 }
             } catch (err) {
-                console.log('Hubo un error: ' + err);
+                console.log('There was an error: ' + err);
             }
     }
 
@@ -76,14 +76,14 @@ class ProductManager {
             let allProducts = await this.getProducts();
             const index = allProducts.findIndex((item) => item.id === idProduct);
             if (index === -1) {
-                return { error: 'producto no encontrado.'}
+                return { error: 'Product not found'}
             }
 
             allProducts[index] = {...productNow, id: idProduct}
             await fs.promises.writeFile(this.path, JSON.stringify(allProducts, null, 2));
-            return `Se actualizó el producto con id: ${idProduct}`;
+            return `Product with id: ${idProduct} updated successfully.`;
         } catch (err) {
-            console.log('Hubo un error: ' + err);
+            console.log('There was an error: ' + err);
         }
     }
 
@@ -93,7 +93,7 @@ class ProductManager {
             let allProducts = await this.getProducts()
             let product = allProducts.filter((item) => item.id !== idProduct)
             await fs.promises.writeFile(this.path, JSON.stringify(product, null, 2))
-            return `Producto con id: ${idProduct} borrado exitosamente.`
+            return `Product with id: ${idProduct} deleted successfully.`
         } catch (err) {
             console.log(err);
         }
